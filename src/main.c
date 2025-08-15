@@ -124,66 +124,73 @@ void image(FILE *file, bmp_t *bmp, sdl_t *sdl){
 }
 
 void header(FILE *file, bmp_t *bmp){
-    fread(&bmp->signature, 0x02, 1, file);
+    printf("--- HEADER ---\n\n");
+
+    uint8_t *header_block = malloc(0X0E);
+    fseek(file, 0X00, SEEK_SET);
+    fread(header_block, 0x01, 0x0E, file);
+
+    memcpy(&bmp->signature, &header_block[0x00], 0x02);
     printf("signature: %s\n", bmp->signature);
 
-    fseek(file, 0X02, SEEK_SET);
-    fread(&bmp->file_size, 0x04, 1, file);
+    memcpy(&bmp->file_size, &header_block[0X02], 0x04);
     printf("file size: %d\n", bmp->file_size);
 
-    fseek(file, 0X06, SEEK_SET);
-    fread(&bmp->reserved, 0x04, 1, file);
+    memcpy(&bmp->reserved, &header_block[0X06], 0x04);
     printf("reserved: %d\n", bmp->reserved);
 
-    fseek(file, 0X0A, SEEK_SET);
-    fread(&bmp->data_offset, 0x04, 1, file);
+    memcpy(&bmp->data_offset, &header_block[0X0A], 0x04);
     printf("data offset: %d\n", bmp->data_offset);
+
+    free(header_block);
+
+    printf("\n--- HEADER ---\n\n");
 }
 
 void info_header(FILE *file, bmp_t *bmp){
+    printf("--- INFO HEADER ---\n\n");
+
     fseek(file, 0X0E, SEEK_SET);
     fread(&bmp->size, 0x04, 1, file);
     printf("size: %d\n", bmp->size);
 
-    fseek(file, 0X12, SEEK_SET);
-    fread(&bmp->width, 0x04, 1, file);
+    uint8_t *header_info_block = malloc(bmp->size - 0x04);
+    fseek(file, 0X0E + 0x04, SEEK_SET);
+    fread(header_info_block, 0x01, bmp->size - 0x04, file);
+
+    memcpy(&bmp->width, &header_info_block[0X00], 0x04);
     printf("width: %d\n", bmp->width);
 
-    fseek(file, 0X16, SEEK_SET);
-    fread(&bmp->height, 0x04, 1, file);
+    memcpy(&bmp->height, &header_info_block[0X04], 0x04);
     printf("height: %d\n", bmp->height);
 
-    fseek(file, 0X1A, SEEK_SET);
-    fread(&bmp->planes, 0x02, 1, file);
+    memcpy(&bmp->planes, &header_info_block[0X08], 0x02);
     printf("planes: %d\n", bmp->planes);
 
-    fseek(file, 0X1C, SEEK_SET);
-    fread(&bmp->bits_per_pixel, 0x02, 1, file);
+    memcpy(&bmp->bits_per_pixel, &header_info_block[0X0A], 0x02);
     printf("bits per pixel: %d\n", bmp->bits_per_pixel);
 
-    fseek(file, 0X1E, SEEK_SET);
-    fread(&bmp->compression, 0x04, 1, file);
+    memcpy(&bmp->compression, &header_info_block[0X0C], 0x04);
     printf("compression: %d\n", bmp->compression);
 
-    fseek(file, 0X22, SEEK_SET);
-    fread(&bmp->image_size, 0x04, 1, file);
+    memcpy(&bmp->image_size, &header_info_block[0X10], 0x04);
     printf("image size: %d\n", bmp->image_size);
 
-    fseek(file, 0X26, SEEK_SET);
-    fread(&bmp->x_pixels_per_m, 0x04, 1, file);
+    memcpy(&bmp->x_pixels_per_m, &header_info_block[0X14], 0x04);
     printf("x pixels per m: %d\n", bmp->x_pixels_per_m);
 
-    fseek(file, 0X2A, SEEK_SET);
-    fread(&bmp->y_pixels_per_m, 0x04, 1, file);
+    memcpy(&bmp->y_pixels_per_m, &header_info_block[0X18], 0x04);
     printf("y pixels per m: %d\n", bmp->y_pixels_per_m);
 
-    fseek(file, 0X2E, SEEK_SET);
-    fread(&bmp->colors_used, 0x04, 1, file);
+    memcpy(&bmp->colors_used, &header_info_block[0X1C], 0x04);
     printf("colors used: %d\n", bmp->colors_used);
 
-    fseek(file, 0X32, SEEK_SET);
-    fread(&bmp->important_colors, 0x04, 1, file);
+    memcpy(&bmp->important_colors, &header_info_block[0X20], 0x04);
     printf("important colors: %d\n", bmp->important_colors);
+
+    free(header_info_block);
+
+    printf("\n--- INFO HEADER ---\n\n");
 }
 
 void color_table(FILE *file, bmp_t *bmp){
