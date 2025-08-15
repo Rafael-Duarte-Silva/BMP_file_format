@@ -83,13 +83,6 @@ void image(FILE *file, bmp_t *bmp, sdl_t *sdl){
     SDL_Rect rect = {.x = 0, .y = bmp->height, .w = 1, .h = 1};
 
     uint32_t row_size = (bmp->bits_per_pixel * bmp->width / 32) * 4;
-    uint32_t padding = 0;
-    uint32_t rest = row_size - bmp->width * padding;
-    if(rest % 4 != 0){
-        padding = rest;
-        printf("padding: %d\n\n", padding);
-    }
-
     uint8_t *img_row = malloc(row_size);
     uint16_t img_column = 0;
     uint16_t img_row_ptr = 0;
@@ -154,41 +147,41 @@ void info_header(FILE *file, bmp_t *bmp){
     fread(&bmp->size, 0x04, 1, file);
     printf("size: %d\n", bmp->size);
 
-    uint8_t *header_info_block = malloc(bmp->size - 0x04);
+    uint8_t *info_header_block = malloc(bmp->size - 0x04);
     fseek(file, 0X0E + 0x04, SEEK_SET);
-    fread(header_info_block, 0x01, bmp->size - 0x04, file);
+    fread(info_header_block, 0x01, bmp->size - 0x04, file);
 
-    memcpy(&bmp->width, &header_info_block[0X00], 0x04);
+    memcpy(&bmp->width, &info_header_block[0X00], 0x04);
     printf("width: %d\n", bmp->width);
 
-    memcpy(&bmp->height, &header_info_block[0X04], 0x04);
+    memcpy(&bmp->height, &info_header_block[0X04], 0x04);
     printf("height: %d\n", bmp->height);
 
-    memcpy(&bmp->planes, &header_info_block[0X08], 0x02);
+    memcpy(&bmp->planes, &info_header_block[0X08], 0x02);
     printf("planes: %d\n", bmp->planes);
 
-    memcpy(&bmp->bits_per_pixel, &header_info_block[0X0A], 0x02);
+    memcpy(&bmp->bits_per_pixel, &info_header_block[0X0A], 0x02);
     printf("bits per pixel: %d\n", bmp->bits_per_pixel);
 
-    memcpy(&bmp->compression, &header_info_block[0X0C], 0x04);
+    memcpy(&bmp->compression, &info_header_block[0X0C], 0x04);
     printf("compression: %d\n", bmp->compression);
 
-    memcpy(&bmp->image_size, &header_info_block[0X10], 0x04);
+    memcpy(&bmp->image_size, &info_header_block[0X10], 0x04);
     printf("image size: %d\n", bmp->image_size);
 
-    memcpy(&bmp->x_pixels_per_m, &header_info_block[0X14], 0x04);
+    memcpy(&bmp->x_pixels_per_m, &info_header_block[0X14], 0x04);
     printf("x pixels per m: %d\n", bmp->x_pixels_per_m);
 
-    memcpy(&bmp->y_pixels_per_m, &header_info_block[0X18], 0x04);
+    memcpy(&bmp->y_pixels_per_m, &info_header_block[0X18], 0x04);
     printf("y pixels per m: %d\n", bmp->y_pixels_per_m);
 
-    memcpy(&bmp->colors_used, &header_info_block[0X1C], 0x04);
+    memcpy(&bmp->colors_used, &info_header_block[0X1C], 0x04);
     printf("colors used: %d\n", bmp->colors_used);
 
-    memcpy(&bmp->important_colors, &header_info_block[0X20], 0x04);
+    memcpy(&bmp->important_colors, &info_header_block[0X20], 0x04);
     printf("important colors: %d\n", bmp->important_colors);
 
-    free(header_info_block);
+    free(info_header_block);
 
     printf("\n--- INFO HEADER ---\n\n");
 }
