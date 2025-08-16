@@ -36,6 +36,8 @@ typedef struct
     uint8_t img_red;
     uint8_t img_blue;
     uint8_t img_green;
+    bool img_y_is_flip;
+    bool img_x_is_flip;
 
     state_t state;
 } bmp_t;
@@ -49,7 +51,7 @@ void image(FILE *file, bmp_t *bmp, sdl_t *sdl);
 bool init_sdl(sdl_t *sdl, bmp_t *bmp);
 void final_cleanup(const sdl_t sdl);
 void clear_screen(const sdl_t sdl);
-void handle_input(bmp_t *bmp);
+void handle_input(FILE *file, bmp_t *bmp, sdl_t *sdl);
 
 int main(int argc, char *argv[]) {
     FILE *file = fopen(argv[1], "rb");
@@ -73,23 +75,27 @@ int main(int argc, char *argv[]) {
 
     bmp.state = RUNNING;
     while(bmp.state != QUIT){
-        handle_input(&bmp);
+        handle_input(file, &bmp, &sdl);
     }
     
     final_cleanup(sdl);
 }
 
 void image(FILE *file, bmp_t *bmp, sdl_t *sdl){
-    SDL_Rect rect = {.x = 0, .y = bmp->height, .w = 1, .h = 1};
+    SDL_Rect rect = {.w = 1, .h = 1};
 
     uint32_t row_size = (bmp->bits_per_pixel * bmp->width / 32) * 4;
     uint8_t *img_row = malloc(row_size);
     uint16_t img_column = 0;
     uint16_t img_row_ptr = 0;
-    while(rect.y > 0){
+    while(img_column < bmp->height){
         fseek(file, bmp->data_offset + img_column * row_size, SEEK_SET);
         fread(img_row, row_size, 1, file);
-        while(rect.x < bmp->width){
+
+        rect.y = bmp->height - img_column - 1;
+        if(bmp->img_y_is_flip) rect.y = img_column;
+
+        for(int x = 0; x < bmp->width; x++){
             bmp->img_blue = img_row[img_row_ptr];
             //printf("img blue: %d\n", bmp->img_blue);
 
@@ -99,16 +105,16 @@ void image(FILE *file, bmp_t *bmp, sdl_t *sdl){
             bmp->img_red = img_row[img_row_ptr + 2];
             //printf("img red: %d\n", bmp->img_red);
 
+            rect.x = x;
+            if(bmp->img_x_is_flip) rect.x = bmp->width - x - 1;
+            
             SDL_SetRenderDrawColor(sdl->renderer, bmp->img_red, bmp->img_green, bmp->img_blue, 0xFF);
             SDL_RenderFillRect(sdl->renderer, &rect);
 
             img_row_ptr += 3;
-            rect.x++;
         }
 
         img_row_ptr = 0;
-        rect.x = 0;
-        rect.y--;
         img_column++;
     }
 
@@ -234,7 +240,7 @@ void final_cleanup(const sdl_t sdl){
     SDL_Quit();
 }
 
-void handle_input(bmp_t *bmp){
+void handle_input(FILE *file, bmp_t *bmp, sdl_t *sdl){
     SDL_Event event;
 
     while(SDL_PollEvent(&event)){
@@ -250,6 +256,16 @@ void handle_input(bmp_t *bmp){
                     case SDLK_ESCAPE:
                         bmp->state = QUIT;
                         return;
+
+                    case SDLK_y:
+                        bmp->img_y_is_flip = !bmp->img_y_is_flip;
+                        image(file, bmp, sdl);
+                        break;
+
+                    case SDLK_x:
+                        bmp->img_x_is_flip = !bmp->img_x_is_flip;
+                        image(file, bmp, sdl);
+                        break;
                         
                     default:
                         break;

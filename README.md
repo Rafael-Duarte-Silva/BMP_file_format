@@ -3,6 +3,12 @@
   ```
   ./main ./src/images/sample1.bmp
   ```
+# Keybinds
+  ```
+  x = flip the image horizontally
+  y = flip the image vertically
+  ```
+
 # References
   Wikipedia: [BMP file format](https://en.wikipedia.org/wiki/BMP_file_format), [RGB color model](https://en.wikipedia.org/wiki/RGB_color_model)
   
