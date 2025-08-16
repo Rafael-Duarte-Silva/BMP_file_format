@@ -65,12 +65,12 @@ void handle_input(FILE *file, bmp_t *bmp, sdl_t *sdl){
 
                     case SDLK_y:
                         bmp->img_y_is_flip = !bmp->img_y_is_flip;
-                        image(file, bmp, sdl);
+                        render_image(file, bmp, sdl);
                         break;
 
                     case SDLK_x:
                         bmp->img_x_is_flip = !bmp->img_x_is_flip;
-                        image(file, bmp, sdl);
+                        render_image(file, bmp, sdl);
                         break;
                         
                     default:

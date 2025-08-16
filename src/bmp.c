@@ -1,6 +1,6 @@
 #include "bmp.h"
 
-void image(FILE *file, bmp_t *bmp, sdl_t *sdl){
+void render_image(FILE *file, bmp_t *bmp, sdl_t *sdl){
     SDL_Rect rect = {.w = 1, .h = 1};
 
     uint32_t row_size = (bmp->bits_per_pixel * bmp->width / 32) * 4;
@@ -41,7 +41,7 @@ void image(FILE *file, bmp_t *bmp, sdl_t *sdl){
     free(img_row);
 }
 
-void header(FILE *file, bmp_t *bmp){
+void get_header(FILE *file, bmp_t *bmp){
     printf("--- HEADER ---\n\n");
 
     uint8_t *header_block = malloc(0X0E);
@@ -65,7 +65,7 @@ void header(FILE *file, bmp_t *bmp){
     printf("\n--- HEADER ---\n\n");
 }
 
-void info_header(FILE *file, bmp_t *bmp){
+void get_info_header(FILE *file, bmp_t *bmp){
     printf("--- INFO HEADER ---\n\n");
 
     fseek(file, 0X0E, SEEK_SET);
@@ -111,5 +111,5 @@ void info_header(FILE *file, bmp_t *bmp){
     printf("\n--- INFO HEADER ---\n\n");
 }
 
-void color_table(FILE *file, bmp_t *bmp){
+void get_color_table(FILE *file, bmp_t *bmp){
 }

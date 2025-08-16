@@ -37,10 +37,10 @@ typedef struct
     state_t state;
 } bmp_t;
 
-void header(FILE *file, bmp_t *bmp);
-void info_header(FILE *file, bmp_t *bmp);
-void color_table(FILE *file, bmp_t *bmp);
+void get_header(FILE *file, bmp_t *bmp);
+void get_info_header(FILE *file, bmp_t *bmp);
+void get_color_table(FILE *file, bmp_t *bmp);
 
-void image(FILE *file, bmp_t *bmp, sdl_t *sdl);
+void render_image(FILE *file, bmp_t *bmp, sdl_t *sdl);
 
 #endif

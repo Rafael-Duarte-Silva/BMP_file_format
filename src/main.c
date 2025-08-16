@@ -13,15 +13,15 @@ int main(int argc, char *argv[]) {
 
     bmp_t bmp = {0};
 
-    header(file, &bmp);
-    info_header(file, &bmp);
-    color_table(file, &bmp);
+    get_header(file, &bmp);
+    get_info_header(file, &bmp);
+    get_color_table(file, &bmp);
 
     sdl_t sdl = {0};
     if(init_sdl(&sdl, &bmp) == false) return 1;
     clear_screen(sdl);
 
-    image(file, &bmp, &sdl);
+    render_image(file, &bmp, &sdl);
 
     bmp.state = RUNNING;
     while(bmp.state != QUIT){
