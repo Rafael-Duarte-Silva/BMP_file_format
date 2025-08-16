@@ -10,8 +10,8 @@ override CFLAGS += $(SDL_CFLAGS)
 HEADERDIR= src/
 SOURCEDIR= src/
 
-HEADER_FILES=
-SOURCE_FILES= main.c
+HEADER_FILES= bmp.h screen.h types.h
+SOURCE_FILES= main.c bmp.c screen.c
 
 HEADERS_FP = $(addprefix $(HEADERDIR),$(HEADER_FILES))
 SOURCE_FP = $(addprefix $(SOURCEDIR),$(SOURCE_FILES))
