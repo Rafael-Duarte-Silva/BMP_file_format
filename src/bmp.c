@@ -119,7 +119,7 @@ bool get_image_data(FILE *file, bmp_t *bmp){
     if(!bmp->img_data) return false;
     
     fseek(file, bmp->data_offset, SEEK_SET);
-    fread(bmp->img_data, bmp->image_size, 1, file);
+    fread(bmp->img_data, 0x01, bmp->image_size, file);
 
     return true;
 }
