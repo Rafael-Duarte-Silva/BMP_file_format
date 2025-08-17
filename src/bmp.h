@@ -28,9 +28,7 @@ typedef struct
     uint32_t colors_used;
     uint32_t important_colors;
 
-    uint8_t img_red;
-    uint8_t img_blue;
-    uint8_t img_green;
+    uint8_t *img_data;
     bool img_y_is_flip;
     bool img_x_is_flip;
 
@@ -40,6 +38,7 @@ typedef struct
 void get_header(FILE *file, bmp_t *bmp);
 void get_info_header(FILE *file, bmp_t *bmp);
 void get_color_table(FILE *file, bmp_t *bmp);
+bool get_image_data(FILE *file, bmp_t *bmp, sdl_t *sdl);
 
 void render_image(FILE *file, bmp_t *bmp, sdl_t *sdl);
 

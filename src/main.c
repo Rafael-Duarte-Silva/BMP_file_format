@@ -21,15 +21,16 @@ int main(int argc, char *argv[]) {
     if(init_sdl(&sdl, &bmp) == false) return 1;
     clear_screen(sdl);
 
+    if(get_image_data(file, &bmp, &sdl) == false) return 1;
     render_image(file, &bmp, &sdl);
 
     bmp.state = RUNNING;
-    SDL_Event event;
     while(bmp.state != QUIT){
-        SDL_WaitEvent(&event);
-        handle_input(event, file, &bmp, &sdl);
+        handle_input(file, &bmp, &sdl);
+        SDL_Delay(41.5f); // ≈ 24 fps 
     }
     
+    free(bmp.img_data);
     fclose(file);
     final_cleanup(sdl);
 }

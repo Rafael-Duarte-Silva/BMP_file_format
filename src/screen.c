@@ -2,7 +2,7 @@
 #include "bmp.h"
 
 bool init_sdl(sdl_t *sdl, bmp_t *bmp){
-    if(SDL_Init(SDL_INIT_VIDEO) != 0){
+    if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0){
         SDL_Log("Could not initialize SDL subsystems! %s\n", SDL_GetError());
         return false;
     }
@@ -59,8 +59,8 @@ void final_cleanup(const sdl_t sdl){
     SDL_Quit();
 }
 
-void handle_input(SDL_Event event, FILE *file, bmp_t *bmp, sdl_t *sdl){
-
+void handle_input(FILE *file, bmp_t *bmp, sdl_t *sdl){
+    SDL_Event event;
     while(SDL_PollEvent(&event)){
         switch (event.type)
         {

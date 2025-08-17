@@ -6,14 +6,6 @@ void render_image(FILE *file, bmp_t *bmp, sdl_t *sdl){
     SDL_LockTexture(sdl->texture, NULL, &pixels, &pitch);
     uint8_t *dest = (uint8_t *)pixels; 
 
-    uint8_t *img_data = malloc(bmp->image_size);
-    if(img_data == NULL){
-        return;
-    }
-    
-    fseek(file, bmp->data_offset, SEEK_SET);
-    fread(img_data, bmp->image_size, 1, file);
-    
     int row_size = (bmp->bits_per_pixel * bmp->width / 32) * 4;
     int y = 0;
     int x = 0;
@@ -25,7 +17,7 @@ void render_image(FILE *file, bmp_t *bmp, sdl_t *sdl){
             x = img_row;
             if(bmp->img_x_is_flip) x = bmp->width - img_row - 1;
 
-            uint8_t *ptr_data = img_data + img_column * row_size + img_row * 3;
+            uint8_t *ptr_data = bmp->img_data + img_column * row_size + img_row * 3;
             uint8_t *ptr_dest = dest + y * pitch + x * 3;
 
             ptr_dest[0] = ptr_data[0]; // blue
@@ -38,7 +30,6 @@ void render_image(FILE *file, bmp_t *bmp, sdl_t *sdl){
     SDL_RenderClear(sdl->renderer);
     SDL_RenderCopy(sdl->renderer, sdl->texture, NULL, NULL);
     SDL_RenderPresent(sdl->renderer);
-    free(img_data);
 }
 
 void get_header(FILE *file, bmp_t *bmp){
@@ -112,4 +103,16 @@ void get_info_header(FILE *file, bmp_t *bmp){
 }
 
 void get_color_table(FILE *file, bmp_t *bmp){
+}
+
+bool get_image_data(FILE *file, bmp_t *bmp, sdl_t *sdl){
+    bmp->img_data = malloc(bmp->image_size);
+    if(bmp->img_data == NULL){
+        return false;
+    }
+    
+    fseek(file, bmp->data_offset, SEEK_SET);
+    fread(bmp->img_data, bmp->image_size, 1, file);
+
+    return true;
 }
