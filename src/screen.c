@@ -32,6 +32,18 @@ bool init_sdl(sdl_t *sdl, bmp_t *bmp){
         return false;
     }
 
+    sdl->texture = SDL_CreateTexture(
+        sdl->renderer,
+        SDL_PIXELFORMAT_BGR24,
+        SDL_TEXTUREACCESS_STREAMING,
+        bmp->width,
+        bmp->height
+    );
+    if(!sdl->texture){
+        SDL_Log("Could not create SDL texture! %s\n", SDL_GetError());
+        return false;
+    }
+
     return true;
 }
 
@@ -41,13 +53,13 @@ void clear_screen(const sdl_t sdl){
 }
 
 void final_cleanup(const sdl_t sdl){
+    SDL_DestroyTexture(sdl.texture);
     SDL_DestroyRenderer(sdl.renderer);
     SDL_DestroyWindow(sdl.window);
     SDL_Quit();
 }
 
-void handle_input(FILE *file, bmp_t *bmp, sdl_t *sdl){
-    SDL_Event event;
+void handle_input(SDL_Event event, FILE *file, bmp_t *bmp, sdl_t *sdl){
 
     while(SDL_PollEvent(&event)){
         switch (event.type)

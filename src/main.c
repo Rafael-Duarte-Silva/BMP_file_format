@@ -24,9 +24,12 @@ int main(int argc, char *argv[]) {
     render_image(file, &bmp, &sdl);
 
     bmp.state = RUNNING;
+    SDL_Event event;
     while(bmp.state != QUIT){
-        handle_input(file, &bmp, &sdl);
+        SDL_WaitEvent(&event);
+        handle_input(event, file, &bmp, &sdl);
     }
     
+    fclose(file);
     final_cleanup(sdl);
 }

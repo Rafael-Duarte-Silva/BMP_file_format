@@ -1,44 +1,44 @@
 #include "bmp.h"
 
 void render_image(FILE *file, bmp_t *bmp, sdl_t *sdl){
-    SDL_Rect rect = {.w = 1, .h = 1};
+    void *pixels;
+    int pitch;
+    SDL_LockTexture(sdl->texture, NULL, &pixels, &pitch);
+    uint8_t *dest = (uint8_t *)pixels; 
 
-    uint32_t row_size = (bmp->bits_per_pixel * bmp->width / 32) * 4;
-    uint8_t *img_row = malloc(row_size);
-    uint16_t img_column = 0;
-    uint16_t img_row_ptr = 0;
-    while(img_column < bmp->height){
-        fseek(file, bmp->data_offset + img_column * row_size, SEEK_SET);
-        fread(img_row, row_size, 1, file);
-
-        rect.y = bmp->height - img_column - 1;
-        if(bmp->img_y_is_flip) rect.y = img_column;
-
-        for(int x = 0; x < bmp->width; x++){
-            bmp->img_blue = img_row[img_row_ptr];
-            //printf("img blue: %d\n", bmp->img_blue);
-
-            bmp->img_green = img_row[img_row_ptr + 1];
-            //printf("img green: %d\n", bmp->img_green);
-
-            bmp->img_red = img_row[img_row_ptr + 2];
-            //printf("img red: %d\n", bmp->img_red);
-
-            rect.x = x;
-            if(bmp->img_x_is_flip) rect.x = bmp->width - x - 1;
-            
-            SDL_SetRenderDrawColor(sdl->renderer, bmp->img_red, bmp->img_green, bmp->img_blue, 0xFF);
-            SDL_RenderFillRect(sdl->renderer, &rect);
-
-            img_row_ptr += 3;
-        }
-
-        img_row_ptr = 0;
-        img_column++;
+    uint8_t *img_data = malloc(bmp->image_size);
+    if(img_data == NULL){
+        return;
     }
+    
+    fseek(file, bmp->data_offset, SEEK_SET);
+    fread(img_data, bmp->image_size, 1, file);
+    
+    int row_size = (bmp->bits_per_pixel * bmp->width / 32) * 4;
+    int y = 0;
+    int x = 0;
+    for(int img_column = 0; img_column < bmp->height; img_column++){
+        y = bmp->height - img_column - 1;
+        if(bmp->img_y_is_flip) y = img_column;
 
+        for(int img_row = 0; img_row < bmp->width; img_row++){
+            x = img_row;
+            if(bmp->img_x_is_flip) x = bmp->width - img_row - 1;
+
+            uint8_t *ptr_data = img_data + img_column * row_size + img_row * 3;
+            uint8_t *ptr_dest = dest + y * pitch + x * 3;
+
+            ptr_dest[0] = ptr_data[0]; // blue
+            ptr_dest[1] = ptr_data[1]; // green
+            ptr_dest[2] = ptr_data[2]; // red
+        }
+    }
+    SDL_UnlockTexture(sdl->texture);
+
+    SDL_RenderClear(sdl->renderer);
+    SDL_RenderCopy(sdl->renderer, sdl->texture, NULL, NULL);
     SDL_RenderPresent(sdl->renderer);
-    free(img_row);
+    free(img_data);
 }
 
 void get_header(FILE *file, bmp_t *bmp){
