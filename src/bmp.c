@@ -105,7 +105,7 @@ void get_info_header(FILE *file, bmp_t *bmp){
 void get_color_table(FILE *file, bmp_t *bmp){
 }
 
-bool get_image_data(FILE *file, bmp_t *bmp, sdl_t *sdl){
+bool get_image_data(FILE *file, bmp_t *bmp){
     bmp->img_data = malloc(bmp->image_size);
     if(bmp->img_data == NULL){
         return false;

@@ -38,7 +38,7 @@ typedef struct
 void get_header(FILE *file, bmp_t *bmp);
 void get_info_header(FILE *file, bmp_t *bmp);
 void get_color_table(FILE *file, bmp_t *bmp);
-bool get_image_data(FILE *file, bmp_t *bmp, sdl_t *sdl);
+bool get_image_data(FILE *file, bmp_t *bmp);
 
 void render_image(FILE *file, bmp_t *bmp, sdl_t *sdl);
 
