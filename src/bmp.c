@@ -32,10 +32,12 @@ void render_image(FILE *file, bmp_t *bmp, sdl_t *sdl){
     SDL_RenderPresent(sdl->renderer);
 }
 
-void get_header(FILE *file, bmp_t *bmp){
+bool get_header(FILE *file, bmp_t *bmp){
     printf("--- HEADER ---\n\n");
 
     uint8_t *header_block = malloc(0X0E);
+    if(!header_block) return false;
+
     fseek(file, 0X00, SEEK_SET);
     fread(header_block, 0x01, 0x0E, file);
 
@@ -54,9 +56,11 @@ void get_header(FILE *file, bmp_t *bmp){
     free(header_block);
 
     printf("\n--- HEADER ---\n\n");
+
+    return true;
 }
 
-void get_info_header(FILE *file, bmp_t *bmp){
+bool get_info_header(FILE *file, bmp_t *bmp){
     printf("--- INFO HEADER ---\n\n");
 
     fseek(file, 0X0E, SEEK_SET);
@@ -64,6 +68,8 @@ void get_info_header(FILE *file, bmp_t *bmp){
     printf("size: %d\n", bmp->size);
 
     uint8_t *info_header_block = malloc(bmp->size - 0x04);
+    if(!info_header_block) return false;
+
     fseek(file, 0X0E + 0x04, SEEK_SET);
     fread(info_header_block, 0x01, bmp->size - 0x04, file);
 
@@ -100,16 +106,17 @@ void get_info_header(FILE *file, bmp_t *bmp){
     free(info_header_block);
 
     printf("\n--- INFO HEADER ---\n\n");
+
+    return true;
 }
 
-void get_color_table(FILE *file, bmp_t *bmp){
+bool get_color_table(FILE *file, bmp_t *bmp){
+    return true;
 }
 
 bool get_image_data(FILE *file, bmp_t *bmp){
     bmp->img_data = malloc(bmp->image_size);
-    if(bmp->img_data == NULL){
-        return false;
-    }
+    if(!bmp->img_data) return false;
     
     fseek(file, bmp->data_offset, SEEK_SET);
     fread(bmp->img_data, bmp->image_size, 1, file);
