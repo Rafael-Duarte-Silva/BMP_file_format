@@ -1,3 +1,6 @@
+# Requirements
+  SDL: [Installation Guide](https://wiki.libsdl.org/SDL2/Installation)
+
 # ⚙️ How to run
   In source folder, paste this command:
   ```
