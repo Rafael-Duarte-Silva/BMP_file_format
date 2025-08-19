@@ -29,8 +29,7 @@ typedef struct
     uint32_t important_colors;
 
     uint8_t *img_data;
-    bool img_y_is_flip;
-    bool img_x_is_flip;
+    int img_row_size;
 
     state_t state;
 } bmp_t;
@@ -43,8 +42,10 @@ bool get_color_table(FILE *file, bmp_t *bmp);
 bool get_image_data(FILE *file, bmp_t *bmp);
 
 void render_image(FILE *file, bmp_t *bmp, sdl_t *sdl, Effect effect);
-int calculate_image_x(uint32_t width, int length, bool is_flip);
-int calculate_image_y(uint32_t height, int length, bool is_flip);
+void flip_image_x(FILE *file, bmp_t *bmp, sdl_t *sdl);
+void flip_image_y(FILE *file, bmp_t *bmp, sdl_t *sdl);
+uint8_t *calculate_ptr_data(bmp_t *bmp, int y, int x);
+void swap_ptr(uint8_t *ptr_data_source,  uint8_t *ptr_data_dest, int index);
 void render_image_normal(uint8_t *ptr_dest, uint8_t *ptr_data);
 void render_image_negative(uint8_t *ptr_dest, uint8_t *ptr_data);
 
