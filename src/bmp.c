@@ -10,16 +10,13 @@ void render_image(FILE *file, bmp_t *bmp, sdl_t *sdl, Effect effect){
     int y = 0;
     int x = 0;
     for(int img_column = 0; img_column < bmp->height; img_column++){
-        y = bmp->height - img_column - 1;
-        if(bmp->img_y_is_flip) y = img_column;
+        y = calculate_image_y(bmp->height, img_column, bmp->img_y_is_flip);
 
         for(int img_row = 0; img_row < bmp->width; img_row++){
-            x = img_row;
-            if(bmp->img_x_is_flip) x = bmp->width - img_row - 1;
+            x = calculate_image_x(bmp->width, img_row, bmp->img_x_is_flip);
 
             uint8_t *ptr_data = bmp->img_data + img_column * row_size + img_row * 3;
             uint8_t *ptr_dest = dest + y * pitch + x * 3;
-
             
             effect(ptr_dest, ptr_data);
         }
@@ -29,6 +26,14 @@ void render_image(FILE *file, bmp_t *bmp, sdl_t *sdl, Effect effect){
     SDL_RenderClear(sdl->renderer);
     SDL_RenderCopy(sdl->renderer, sdl->texture, NULL, NULL);
     SDL_RenderPresent(sdl->renderer);
+}
+
+int calculate_image_x(uint32_t width, int length, bool is_flip){
+    return is_flip ? width - length - 1 : length;
+}
+
+int calculate_image_y(uint32_t height, int length, bool is_flip){
+    return is_flip ? length : height - length - 1;
 }
 
 void render_image_normal(uint8_t *ptr_dest, uint8_t *ptr_data){

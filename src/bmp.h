@@ -44,6 +44,8 @@ bool get_color_table(FILE *file, bmp_t *bmp);
 bool get_image_data(FILE *file, bmp_t *bmp);
 
 void render_image(FILE *file, bmp_t *bmp, sdl_t *sdl, Effect effect);
+int calculate_image_x(uint32_t width, int length, bool is_flip);
+int calculate_image_y(uint32_t height, int length, bool is_flip);
 void render_image_normal(uint8_t *ptr_dest, uint8_t *ptr_data);
 void render_image_negative(uint8_t *ptr_dest, uint8_t *ptr_data);
 
