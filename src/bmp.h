@@ -31,7 +31,6 @@ typedef struct
     uint8_t *img_data;
     bool img_y_is_flip;
     bool img_x_is_flip;
-    bool img_is_negative;
 
     state_t state;
 } bmp_t;

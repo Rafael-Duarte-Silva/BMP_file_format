@@ -43,9 +43,13 @@ void render_image_normal(uint8_t *ptr_dest, uint8_t *ptr_data){
 }
 
 void render_image_negative(uint8_t *ptr_dest, uint8_t *ptr_data){
-    ptr_dest[0] = 255 - ptr_data[0]; // blue
-    ptr_dest[1] = 255 - ptr_data[1]; // green
-    ptr_dest[2] = 255 - ptr_data[2]; // red
+    ptr_data[0] = 255 - ptr_data[0]; // blue
+    ptr_data[1] = 255 - ptr_data[1]; // green
+    ptr_data[2] = 255 - ptr_data[2]; // red
+
+    ptr_dest[0] = ptr_data[0]; // blue
+    ptr_dest[1] = ptr_data[1]; // green
+    ptr_dest[2] = ptr_data[2]; // red
 }
 
 bool get_header(FILE *file, bmp_t *bmp){

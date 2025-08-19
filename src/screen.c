@@ -86,15 +86,7 @@ void handle_input(FILE *file, bmp_t *bmp, sdl_t *sdl){
                         break;
 
                     case SDLK_i:
-                        bmp->img_is_negative = !bmp->img_is_negative;
-
-                        if(bmp->img_is_negative)
-                        {
-                            render_image(file, bmp, sdl, render_image_negative);
-                            break;
-                        }
-
-                        render_image(file, bmp, sdl, render_image_normal);
+                        render_image(file, bmp, sdl, render_image_negative);
                         break;
                         
                     default:
