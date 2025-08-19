@@ -1,6 +1,6 @@
 #include "bmp.h"
 
-void render_image(FILE *file, bmp_t *bmp, sdl_t *sdl, Effect effect){
+void render_image(FILE *file, bmp_t *bmp, sdl_t *sdl){
     void *pixels;
     int pitch;
     SDL_LockTexture(sdl->texture, NULL, &pixels, &pitch);
@@ -14,7 +14,9 @@ void render_image(FILE *file, bmp_t *bmp, sdl_t *sdl, Effect effect){
             uint8_t *ptr_data = calculate_ptr_data(bmp, img_column, img_row);
             uint8_t *ptr_dest = dest + y * pitch + img_row * 3;
             
-            effect(ptr_dest, ptr_data);
+            ptr_dest[0] = ptr_data[0]; // blue
+            ptr_dest[1] = ptr_data[1]; // green
+            ptr_dest[2] = ptr_data[2]; // red
         }
     }
     SDL_UnlockTexture(sdl->texture);
@@ -22,6 +24,23 @@ void render_image(FILE *file, bmp_t *bmp, sdl_t *sdl, Effect effect){
     SDL_RenderClear(sdl->renderer);
     SDL_RenderCopy(sdl->renderer, sdl->texture, NULL, NULL);
     SDL_RenderPresent(sdl->renderer);
+}
+
+void render_image_negative(FILE *file, bmp_t *bmp, sdl_t *sdl){
+    int y = 0;
+    for(int img_column = 0; img_column < bmp->height; img_column++){
+        y = bmp->height - img_column - 1;
+
+        for(int img_row = 0; img_row < bmp->width; img_row++){
+            uint8_t *ptr_data = calculate_ptr_data(bmp, img_column, img_row);
+            
+            ptr_data[0] = 255 - ptr_data[0]; // blue
+            ptr_data[1] = 255 - ptr_data[1]; // green
+            ptr_data[2] = 255 - ptr_data[2]; // red
+        }
+    }
+
+    render_image(file, bmp, sdl);
 }
 
 void flip_image_x(FILE *file, bmp_t *bmp, sdl_t *sdl){
@@ -41,7 +60,7 @@ void flip_image_x(FILE *file, bmp_t *bmp, sdl_t *sdl){
         }
     }
 
-    render_image(file, bmp, sdl, render_image_normal);
+    render_image(file, bmp, sdl);
 }
 
 void flip_image_y(FILE *file, bmp_t *bmp, sdl_t *sdl){
@@ -61,7 +80,7 @@ void flip_image_y(FILE *file, bmp_t *bmp, sdl_t *sdl){
         img_column_bottom--;
     }
 
-    render_image(file, bmp, sdl, render_image_normal);
+    render_image(file, bmp, sdl);
 }
 
 void swap_ptr(uint8_t *ptr_data_source,  uint8_t *ptr_data_dest, int index){
@@ -72,22 +91,6 @@ void swap_ptr(uint8_t *ptr_data_source,  uint8_t *ptr_data_dest, int index){
 
 uint8_t *calculate_ptr_data(bmp_t *bmp, int y, int x){
     return bmp->img_data + y * bmp->img_row_size + x * 3;
-}
-
-void render_image_normal(uint8_t *ptr_dest, uint8_t *ptr_data){
-    ptr_dest[0] = ptr_data[0]; // blue
-    ptr_dest[1] = ptr_data[1]; // green
-    ptr_dest[2] = ptr_data[2]; // red
-}
-
-void render_image_negative(uint8_t *ptr_dest, uint8_t *ptr_data){
-    ptr_data[0] = 255 - ptr_data[0]; // blue
-    ptr_data[1] = 255 - ptr_data[1]; // green
-    ptr_data[2] = 255 - ptr_data[2]; // red
-
-    ptr_dest[0] = ptr_data[0]; // blue
-    ptr_dest[1] = ptr_data[1]; // green
-    ptr_dest[2] = ptr_data[2]; // red
 }
 
 bool get_header(FILE *file, bmp_t *bmp){
