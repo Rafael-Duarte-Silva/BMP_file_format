@@ -31,15 +31,20 @@ typedef struct
     uint8_t *img_data;
     bool img_y_is_flip;
     bool img_x_is_flip;
+    bool img_is_negative;
 
     state_t state;
 } bmp_t;
+
+typedef void (*Effect)(uint8_t *ptr_dest, uint8_t *ptr_data);
 
 bool get_header(FILE *file, bmp_t *bmp);
 bool get_info_header(FILE *file, bmp_t *bmp);
 bool get_color_table(FILE *file, bmp_t *bmp);
 bool get_image_data(FILE *file, bmp_t *bmp);
 
-void render_image(FILE *file, bmp_t *bmp, sdl_t *sdl);
+void render_image(FILE *file, bmp_t *bmp, sdl_t *sdl, Effect effect);
+void render_image_normal(uint8_t *ptr_dest, uint8_t *ptr_data);
+void render_image_negative(uint8_t *ptr_dest, uint8_t *ptr_data);
 
 #endif

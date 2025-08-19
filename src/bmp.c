@@ -1,6 +1,6 @@
 #include "bmp.h"
 
-void render_image(FILE *file, bmp_t *bmp, sdl_t *sdl){
+void render_image(FILE *file, bmp_t *bmp, sdl_t *sdl, Effect effect){
     void *pixels;
     int pitch;
     SDL_LockTexture(sdl->texture, NULL, &pixels, &pitch);
@@ -20,9 +20,8 @@ void render_image(FILE *file, bmp_t *bmp, sdl_t *sdl){
             uint8_t *ptr_data = bmp->img_data + img_column * row_size + img_row * 3;
             uint8_t *ptr_dest = dest + y * pitch + x * 3;
 
-            ptr_dest[0] = ptr_data[0]; // blue
-            ptr_dest[1] = ptr_data[1]; // green
-            ptr_dest[2] = ptr_data[2]; // red
+            
+            effect(ptr_dest, ptr_data);
         }
     }
     SDL_UnlockTexture(sdl->texture);
@@ -30,6 +29,18 @@ void render_image(FILE *file, bmp_t *bmp, sdl_t *sdl){
     SDL_RenderClear(sdl->renderer);
     SDL_RenderCopy(sdl->renderer, sdl->texture, NULL, NULL);
     SDL_RenderPresent(sdl->renderer);
+}
+
+void render_image_normal(uint8_t *ptr_dest, uint8_t *ptr_data){
+    ptr_dest[0] = ptr_data[0]; // blue
+    ptr_dest[1] = ptr_data[1]; // green
+    ptr_dest[2] = ptr_data[2]; // red
+}
+
+void render_image_negative(uint8_t *ptr_dest, uint8_t *ptr_data){
+    ptr_dest[0] = 255 - ptr_data[0]; // blue
+    ptr_dest[1] = 255 - ptr_data[1]; // green
+    ptr_dest[2] = 255 - ptr_data[2]; // red
 }
 
 bool get_header(FILE *file, bmp_t *bmp){

@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
     if(!init_sdl(&sdl, &bmp)) return 1;
     clear_screen(sdl);
 
-    render_image(file, &bmp, &sdl);
+    render_image(file, &bmp, &sdl, render_image_normal);
 
     bmp.state = RUNNING;
     while(bmp.state != QUIT){
