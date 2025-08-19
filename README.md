@@ -10,6 +10,7 @@
   ```
   x = flip the image horizontally
   y = flip the image vertically
+  i = invert image color
   ```
 
 # References
