@@ -43,6 +43,19 @@ void rotate_image(FILE *file, bmp_t *bmp, sdl_t *sdl){
     uint8_t *img_data = malloc(bmp->image_size);
     if(!img_data) return;
 
+    SDL_DestroyTexture(sdl->texture);
+    sdl->texture = SDL_CreateTexture(
+        sdl->renderer,
+        SDL_PIXELFORMAT_BGR24,
+        SDL_TEXTUREACCESS_STREAMING,
+        bmp->height,
+        bmp->width
+    );
+    if(!sdl->texture){
+        free(img_data);        
+        return;
+    }
+
     int img_row_size_rotate = (bmp->bits_per_pixel * bmp->height / 32) * 4;
     int y = 0;
     for(int img_column = 0; img_column < bmp->height; img_column++){
@@ -66,19 +79,6 @@ void rotate_image(FILE *file, bmp_t *bmp, sdl_t *sdl){
             ptr_data_rotate[1] = ptr_data[1]; // green
             ptr_data_rotate[2] = ptr_data[2]; // red
         }
-    }
-
-    SDL_DestroyTexture(sdl->texture);
-    sdl->texture = SDL_CreateTexture(
-        sdl->renderer,
-        SDL_PIXELFORMAT_BGR24,
-        SDL_TEXTUREACCESS_STREAMING,
-        bmp->height,
-        bmp->width
-    );
-    if(!sdl->texture){
-        free(img_data);        
-        return;
     }
 
     uint32_t swap = bmp->width;
