@@ -11,13 +11,13 @@ void render_image(FILE *file, bmp_t *bmp, sdl_t *sdl){
         y = bmp->height - img_column - 1;
 
         for(int img_row = 0; img_row < bmp->width; img_row++){
-            uint8_t *ptr_data = calculate_ptr_data(
+            uint8_t *ptr_data = calculate_ptr(
                 bmp->img_data, 
                 bmp->img_row_size, 
                 img_column, 
                 img_row
             );
-            uint8_t *ptr_dest = dest + y * pitch + img_row * 3;
+            uint8_t *ptr_dest = calculate_ptr(dest, pitch, y, img_row);
             
             ptr_dest[0] = ptr_data[0]; // blue
             ptr_dest[1] = ptr_data[1]; // green
@@ -62,13 +62,13 @@ void rotate_image(FILE *file, bmp_t *bmp, sdl_t *sdl){
         y = bmp->height - img_column - 1;
 
         for(int img_row = 0; img_row < bmp->width; img_row++){
-            uint8_t *ptr_data = calculate_ptr_data(
+            uint8_t *ptr_data = calculate_ptr(
                 bmp->img_data, 
                 bmp->img_row_size, 
                 img_column, 
                 img_row
             );
-            uint8_t *ptr_data_rotate = calculate_ptr_data(
+            uint8_t *ptr_data_rotate = calculate_ptr(
                 img_data, 
                 img_row_size_rotate, 
                 img_row, 
@@ -98,7 +98,7 @@ void render_image_negative(FILE *file, bmp_t *bmp, sdl_t *sdl){
         y = bmp->height - img_column - 1;
 
         for(int img_row = 0; img_row < bmp->width; img_row++){
-            uint8_t *ptr_data = calculate_ptr_data(
+            uint8_t *ptr_data = calculate_ptr(
                 bmp->img_data, 
                 bmp->img_row_size, 
                 img_column, 
@@ -119,13 +119,13 @@ void flip_image_x(FILE *file, bmp_t *bmp, sdl_t *sdl){
         int img_row_right = bmp->width - 1;
         int img_row_left = 0;
         while(img_row_left < img_row_right){
-            uint8_t *ptr_data_right = calculate_ptr_data(
+            uint8_t *ptr_data_right = calculate_ptr(
                 bmp->img_data, 
                 bmp->img_row_size, 
                 img_column, 
                 img_row_left
             );
-            uint8_t *ptr_data_left = calculate_ptr_data(
+            uint8_t *ptr_data_left = calculate_ptr(
                 bmp->img_data, 
                 bmp->img_row_size, 
                 img_column, 
@@ -149,13 +149,13 @@ void flip_image_y(FILE *file, bmp_t *bmp, sdl_t *sdl){
     int img_column_top = 0;
     while(img_column_top < img_column_bottom){
        for(int img_row = 0; img_row < bmp->width; img_row++){
-            uint8_t *ptr_data_bottom = calculate_ptr_data(
+            uint8_t *ptr_data_bottom = calculate_ptr(
                 bmp->img_data, 
                 bmp->img_row_size, 
                 img_column_bottom, 
                 img_row
             );
-            uint8_t *ptr_data_top = calculate_ptr_data(
+            uint8_t *ptr_data_top = calculate_ptr(
                 bmp->img_data, 
                 bmp->img_row_size, 
                 img_column_top, 
@@ -180,7 +180,7 @@ void swap_ptr(uint8_t *ptr_data_source,  uint8_t *ptr_data_dest, int index){
     ptr_data_dest[index] = swap;
 }
 
-uint8_t *calculate_ptr_data(uint8_t *dest, int row_size, int y, int x){
+uint8_t *calculate_ptr(uint8_t *dest, int row_size, int y, int x){
     return dest + y * row_size + x * 3;
 }
 
