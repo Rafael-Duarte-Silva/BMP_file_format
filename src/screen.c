@@ -7,12 +7,17 @@ bool init_sdl(sdl_t *sdl, bmp_t *bmp){
         return false;
     }
 
+    *sdl = (sdl_t){
+        .width = bmp->width,
+        .height = bmp->width
+    };
+
     sdl->window = SDL_CreateWindow(
         "BMP",
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
-        bmp->width,
-        bmp->height,
+        sdl->width,
+        sdl->width,
         0
     );
 
@@ -85,6 +90,10 @@ void handle_input(FILE *file, bmp_t *bmp, sdl_t *sdl){
 
                     case SDLK_i:
                         render_image_negative(file, bmp, sdl);
+                        break;
+
+                    case SDLK_r:
+                        rotate_image(file, bmp, sdl);
                         break;
                         
                     default:

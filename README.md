@@ -11,6 +11,7 @@
   x = flip the image horizontally
   y = flip the image vertically
   i = invert image color
+  r = rotate image
   ```
 
 # References

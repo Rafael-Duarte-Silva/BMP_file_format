@@ -40,9 +40,10 @@ bool get_color_table(FILE *file, bmp_t *bmp);
 bool get_image_data(FILE *file, bmp_t *bmp);
 
 void render_image(FILE *file, bmp_t *bmp, sdl_t *sdl);
+void rotate_image(FILE *file, bmp_t *bmp, sdl_t *sdl);
 void flip_image_x(FILE *file, bmp_t *bmp, sdl_t *sdl);
 void flip_image_y(FILE *file, bmp_t *bmp, sdl_t *sdl);
-uint8_t *calculate_ptr_data(bmp_t *bmp, int y, int x);
+uint8_t *calculate_ptr_data(uint8_t *dest, int row_size, int y, int x);
 void swap_ptr(uint8_t *ptr_data_source,  uint8_t *ptr_data_dest, int index);
 void render_image_negative(FILE *file, bmp_t *bmp, sdl_t *sdl);
 

@@ -11,7 +11,12 @@ void render_image(FILE *file, bmp_t *bmp, sdl_t *sdl){
         y = bmp->height - img_column - 1;
 
         for(int img_row = 0; img_row < bmp->width; img_row++){
-            uint8_t *ptr_data = calculate_ptr_data(bmp, img_column, img_row);
+            uint8_t *ptr_data = calculate_ptr_data(
+                bmp->img_data, 
+                bmp->img_row_size, 
+                img_column, 
+                img_row
+            );
             uint8_t *ptr_dest = dest + y * pitch + img_row * 3;
             
             ptr_dest[0] = ptr_data[0]; // blue
@@ -21,9 +26,70 @@ void render_image(FILE *file, bmp_t *bmp, sdl_t *sdl){
     }
     SDL_UnlockTexture(sdl->texture);
 
+    int texture_x_center = sdl->width / 2 - bmp->width / 2;
+    int texture_y_center = sdl->height / 2 - bmp->height / 2;
+    SDL_Rect rect = {
+        .x = texture_x_center, 
+        .y = texture_y_center, 
+        .w = bmp->width,
+        .h = bmp->height
+    };
     SDL_RenderClear(sdl->renderer);
-    SDL_RenderCopy(sdl->renderer, sdl->texture, NULL, NULL);
+    SDL_RenderCopy(sdl->renderer, sdl->texture, NULL, &rect);
     SDL_RenderPresent(sdl->renderer);
+}
+
+void rotate_image(FILE *file, bmp_t *bmp, sdl_t *sdl){
+    uint8_t *img_data = malloc(bmp->image_size);
+    if(!img_data) return;
+
+    int img_row_size_rotate = (bmp->bits_per_pixel * bmp->height / 32) * 4;
+    int y = 0;
+    for(int img_column = 0; img_column < bmp->height; img_column++){
+        y = bmp->height - img_column - 1;
+
+        for(int img_row = 0; img_row < bmp->width; img_row++){
+            uint8_t *ptr_data = calculate_ptr_data(
+                bmp->img_data, 
+                bmp->img_row_size, 
+                img_column, 
+                img_row
+            );
+            uint8_t *ptr_data_rotate = calculate_ptr_data(
+                img_data, 
+                img_row_size_rotate, 
+                img_row, 
+                y
+            );
+            
+            ptr_data_rotate[0] = ptr_data[0]; // blue
+            ptr_data_rotate[1] = ptr_data[1]; // green
+            ptr_data_rotate[2] = ptr_data[2]; // red
+        }
+    }
+
+    SDL_DestroyTexture(sdl->texture);
+    sdl->texture = SDL_CreateTexture(
+        sdl->renderer,
+        SDL_PIXELFORMAT_BGR24,
+        SDL_TEXTUREACCESS_STREAMING,
+        bmp->height,
+        bmp->width
+    );
+    if(!sdl->texture){
+        free(img_data);        
+        return;
+    }
+
+    uint32_t swap = bmp->width;
+    bmp->width = bmp->height;
+    bmp->height = swap;
+
+    free(bmp->img_data);
+    bmp->img_data = img_data;
+    bmp->img_row_size = img_row_size_rotate;
+
+    render_image(file, bmp, sdl);
 }
 
 void render_image_negative(FILE *file, bmp_t *bmp, sdl_t *sdl){
@@ -32,7 +98,12 @@ void render_image_negative(FILE *file, bmp_t *bmp, sdl_t *sdl){
         y = bmp->height - img_column - 1;
 
         for(int img_row = 0; img_row < bmp->width; img_row++){
-            uint8_t *ptr_data = calculate_ptr_data(bmp, img_column, img_row);
+            uint8_t *ptr_data = calculate_ptr_data(
+                bmp->img_data, 
+                bmp->img_row_size, 
+                img_column, 
+                img_row
+            );
             
             ptr_data[0] = 255 - ptr_data[0]; // blue
             ptr_data[1] = 255 - ptr_data[1]; // green
@@ -48,8 +119,18 @@ void flip_image_x(FILE *file, bmp_t *bmp, sdl_t *sdl){
         int img_row_right = bmp->width - 1;
         int img_row_left = 0;
         while(img_row_left < img_row_right){
-            uint8_t *ptr_data_right = calculate_ptr_data(bmp, img_column, img_row_left);
-            uint8_t *ptr_data_left = calculate_ptr_data(bmp, img_column, img_row_right);
+            uint8_t *ptr_data_right = calculate_ptr_data(
+                bmp->img_data, 
+                bmp->img_row_size, 
+                img_column, 
+                img_row_left
+            );
+            uint8_t *ptr_data_left = calculate_ptr_data(
+                bmp->img_data, 
+                bmp->img_row_size, 
+                img_column, 
+                img_row_right
+            );
 
             swap_ptr(ptr_data_right, ptr_data_left, 0);
             swap_ptr(ptr_data_right, ptr_data_left, 1);
@@ -68,8 +149,18 @@ void flip_image_y(FILE *file, bmp_t *bmp, sdl_t *sdl){
     int img_column_top = 0;
     while(img_column_top < img_column_bottom){
        for(int img_row = 0; img_row < bmp->width; img_row++){
-            uint8_t *ptr_data_bottom = calculate_ptr_data(bmp, img_column_bottom, img_row);
-            uint8_t *ptr_data_top = calculate_ptr_data(bmp, img_column_top, img_row);
+            uint8_t *ptr_data_bottom = calculate_ptr_data(
+                bmp->img_data, 
+                bmp->img_row_size, 
+                img_column_bottom, 
+                img_row
+            );
+            uint8_t *ptr_data_top = calculate_ptr_data(
+                bmp->img_data, 
+                bmp->img_row_size, 
+                img_column_top, 
+                img_row
+            );
 
             swap_ptr(ptr_data_top, ptr_data_bottom, 0);
             swap_ptr(ptr_data_top, ptr_data_bottom, 1);
@@ -89,8 +180,8 @@ void swap_ptr(uint8_t *ptr_data_source,  uint8_t *ptr_data_dest, int index){
     ptr_data_dest[index] = swap;
 }
 
-uint8_t *calculate_ptr_data(bmp_t *bmp, int y, int x){
-    return bmp->img_data + y * bmp->img_row_size + x * 3;
+uint8_t *calculate_ptr_data(uint8_t *dest, int row_size, int y, int x){
+    return dest + y * row_size + x * 3;
 }
 
 bool get_header(FILE *file, bmp_t *bmp){

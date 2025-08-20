@@ -8,6 +8,8 @@ typedef struct {
     SDL_Window *window;
     SDL_Renderer *renderer;
     SDL_Texture *texture;
+    int width;
+    int height;
 } sdl_t;
 
 typedef enum {
